@@ -1,0 +1,60 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: drbd-installer
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      app: drbd-installer
+  template:
+    metadata:
+      labels:
+        app: drbd-installer
+    spec:
+      serviceAccount: dce-admin
+      containers:
+        - name: metrics
+          image: 10.6.170.180/drbd-installer/drbd-installer:v99.9.9
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 100Mi
+              cpu: 100m
+            requests:
+              memory: 100Mi
+              cpu: 100m
+          args:
+            - -debug=true
+            - -block-the-pod=true
+          securityContext:
+            privileged: true
+          env:
+            - name: CMD_NSENTER_RUN_ARGS
+              value: --mount=/var/host/proc/1/ns/mnt,--ipc=/var/host/proc/1/ns/ipc,--net=/var/host/proc/1/ns/net,--
+            - name: CMD_NSENTER_ARGS_SEP
+              value: ","
+          volumeMounts:
+            - mountPath: /var/host/proc
+              name: host-proc
+            - mountPath: /lib/modules
+              name: host-modules-dir
+      tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+      - effect: NoSchedule
+        key: node.kubernetes.io/not-ready
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - effect: NoSchedule
+        key: node.cloudprovider.kubernetes.io/uninitialized
+        operator: Exists
+      volumes:
+        - name: host-proc
+          hostPath:
+            path: /proc
+        - name: host-modules-dir
+          hostPath:
+            path: /lib/modules
