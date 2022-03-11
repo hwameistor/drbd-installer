@@ -16,7 +16,7 @@ import (
 
 var (
 	debug                              = flag.Bool("debug", true, "debug mode, true by default")
-	block                              = flag.Bool("block-the-pod", false, "block when succeccfully installed drbd ko")
+	block                              = flag.Bool("block-the-pod", false, "block after succeccfully installed drbd kernel mods")
 	BUILDVERSION, BUILDTIME, GOVERSION string
 )
 
@@ -32,7 +32,6 @@ func setupLogging(enableDebug bool) {
 	log.SetFormatter(&log.TextFormatter{
 		DisableColors: true,
 		FullTimestamp: true,
-		// log with funcname, file fileds. eg: func=processNode file="node_task_worker.go:43"
 		CallerPrettyfier: func(f *runtime.Frame) (string, string) {
 			s := strings.Split(f.Function, ".")
 			funcname := s[len(s)-1]
@@ -54,32 +53,32 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Info("Start find Suitable DRBD Kernel Mod")
+	log.Info("start finding Suitable DRBD kernel mods")
 	if !DRBDKernelModInstaller.HasSuitableDRBDKernelModBuilds() {
-		log.Errorf("No Suitable DRBD Kernel Mods")
+		log.Errorf("No Suitable DRBD kernel mods")
 		return
 	}
 
-	log.Info("Start copy DRBD kernel mod to host")
+	log.Info("start copying DRBD kernel mods to host")
 	if err := DRBDKernelModInstaller.CopyKernelModToHost(); err != nil {
-		log.WithError(err).Error("Failed to copy DRBD kernel mod to host")
+		log.WithError(err).Error("Failed to copy DRBD kernel mods to host")
 		return
 	}
 
-	log.Info("Start install DRBD kernel mod on host")
+	log.Info("start installing DRBD kernel mods on host")
 	if err := DRBDKernelModInstaller.Insmod(); err != nil {
-		log.WithError(err).Error("Failed to install DRBD kernel mod on host")
+		log.WithError(err).Error("Failed to install DRBD kernel mods on host")
 		return
 	}
 
-	log.Info("Start nsure DRBD kernel mod auto load when host restarted")
+	log.Info("start ensuring DRBD kernel mods reload when host restarted")
 	if err := DRBDKernelModInstaller.EnsureAutoLoadWhenHostRestarted(); err != nil {
-		log.WithError(err).Error("Failed to ensure DRBD kernel mod auto load when host restarted")
+		log.WithError(err).Error("Failed to ensure DRBD kernel mods auto load when host restarted")
 		return
 	}
 
 	if *block {
-		log.Info("Blocking for debug reason")
+		log.Info("blocking for debug reason")
 		select {}
 	}
 }

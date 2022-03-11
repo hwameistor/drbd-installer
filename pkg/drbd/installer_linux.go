@@ -39,13 +39,12 @@ func NewDRBDKernelModInstaller() (*DRBDKernelModInstaller, error) {
 	installer.KernelModToHostPath = strings.ToLower(fmt.Sprintf("/lib/modules/%s/extra/drbd90", installer.KernelVersionReleaseOriginString))
 	installer.KernelModSourcePath = strings.ToLower(fmt.Sprintf("/kernel-mods/drbd/%s/%s/%s/%s", installer.OS, installer.KernelVersion, installer.KernelRelease, installer.Arch))
 
-	log.Infof("Start install DRBD kernel modules into Host OS...")
-	log.Infof("Host OS: %s", installer.OS)
-	log.Infof("Host CPU Arch: %s", installer.Arch)
-	log.Infof("Host Kernel: %s", installer.KernelVersionReleaseOriginString)
-	log.Infof("Host Kernel Version: %s", installer.KernelVersion)
-	log.Infof("Host Kernel Release: %s", installer.KernelRelease)
-	log.Infof("Host Kernel Mod Host Path: %s", installer.KernelModToHostPath)
+	log.Infof("host OS: %s", installer.OS)
+	log.Infof("host CPU arch: %s", installer.Arch)
+	log.Infof("host kernel: %s", installer.KernelVersionReleaseOriginString)
+	log.Infof("host kernel version: %s", installer.KernelVersion)
+	log.Infof("host kernel release: %s", installer.KernelRelease)
+	log.Infof("host kernel mods Host Path: %s", installer.KernelModToHostPath)
 
 	return installer, nil
 }
@@ -54,7 +53,6 @@ func (i *DRBDKernelModInstaller) HasSuitableDRBDKernelModBuilds() bool {
 	if _, err := os.Stat(i.KernelModSourcePath); os.IsNotExist(err) {
 		return false
 	} else if err != nil {
-		// TODO log
 		return false
 	}
 
@@ -117,7 +115,7 @@ func (i *DRBDKernelModInstaller) Insmod() error {
 			}
 			return fmt.Errorf("%w(%s)", execRst.Error, execRst.ErrBuf.Bytes())
 		}
-		log.Infof("%s has being successful installed on host", file.Name())
+		log.Infof("%s has being successfully installed on host", file.Name())
 	}
 	return nil
 }
@@ -146,7 +144,7 @@ func (i *DRBDKernelModInstaller) parseKernelVersionAndRelease() error {
 	versionReleaseStr := int8ToStr(uname.Release[:])
 	splitedVersionReleaseStr := strings.Split(versionReleaseStr, "-")
 	if len(splitedVersionReleaseStr) < 2 {
-		return fmt.Errorf("Failed to parse kernel version and release. origin string: %s", splitedVersionReleaseStr)
+		return fmt.Errorf("failed to parse kernel version and release. origin string is %q", splitedVersionReleaseStr)
 	}
 
 	version := splitedVersionReleaseStr[0]
