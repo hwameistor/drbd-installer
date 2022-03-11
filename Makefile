@@ -1,4 +1,4 @@
-REGISTRY ?= gchr.io/hwameistor
+REGISTRY ?= ghcr.io/hwameistor
 GO_VERSION = $(shell go version)
 BUILD_TIME = ${shell date +%Y-%m-%dT%H:%M:%SZ}
 BUILD_VERSION = ${shell git rev-parse --short "HEAD^{commit}" 2>/dev/null}
@@ -10,7 +10,7 @@ BINS_DIR = ${PROJECT_SOURCE_CODE_DIR}/_build
 CMDS_DIR = ${PROJECT_SOURCE_CODE_DIR}/cmd
 IMAGES_DIR = ${PROJECT_SOURCE_CODE_DIR}/images
 BUILD_CMD = go build
-BUILDER_NAME = ${REGISTRY}/builder
+BUILDER_NAME = ${REGISTRY}/drbd-installer-builder
 BUILDER_IMAGE_TAG = latest
 BUILDER_MOUNT_SRC_DIR = ${PROJECT_SOURCE_CODE_DIR}/../
 BUILDER_MOUNT_DST_DIR = /go/src/github.com/hwameistor
