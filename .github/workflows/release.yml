@@ -1,4 +1,4 @@
-name: Release Local Disk Manager
+name: Release DRBD installer
 
 on:
   create:
