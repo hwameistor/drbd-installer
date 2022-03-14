@@ -15,7 +15,7 @@ spec:
       serviceAccount: dce-admin
       containers:
         - name: metrics
-          image: 10.6.170.180/drbd-installer/drbd-installer:v99.9.9
+          image: ghcr.io/hwameistor/drbd-installer:v0.1.0
           imagePullPolicy: Always
           resources:
             limits:
