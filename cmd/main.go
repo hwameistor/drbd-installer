@@ -13,6 +13,7 @@ import (
 )
 
 var (
+	skipError                          = flag.Bool("skip-error", false, "skip when error occur, false by default")
 	debug                              = flag.Bool("debug", true, "debug mode, true by default")
 	block                              = flag.Bool("block-the-pod", false, "block after succeccfully installed drbd kernel mods")
 	BUILDVERSION, BUILDTIME, GOVERSION string
@@ -72,13 +73,17 @@ func main() {
 	log.Info("start generating DRBD kernel mods dependencies")
 	if err := DRBDKernelModInstaller.Depmod(); err != nil {
 		log.WithError(err).Error("Failed to generate DRBD kernel mods dependencies")
-		return
+		if !*skipError {
+			return
+		}
 	}
 
 	log.Info("start installing DRBD kernel mods on host")
 	if err := DRBDKernelModInstaller.Modprobe(); err != nil {
 		log.WithError(err).Error("Failed to install DRBD kernel mods on host")
-		return
+		if !*skipError {
+			return
+		}
 	}
 
 	log.Info("start ensuring DRBD kernel mods reload when host restarted")
