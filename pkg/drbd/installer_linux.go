@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
@@ -92,30 +93,38 @@ func (i *DRBDKernelModInstaller) CopyKernelModToHost() error {
 	return nil
 }
 
-func (i *DRBDKernelModInstaller) Insmod() error {
+func (i *DRBDKernelModInstaller) Depmod() error {
+	cmd := exechelper.ExecParams{
+		CmdName: "depmod",
+	}
+
+	exec := nsexecutor.New()
+	execRst := exec.RunCommand(cmd)
+	if execRst.ExitCode != 0 {
+		return fmt.Errorf("%w(%s)", execRst.Error, execRst.ErrBuf.Bytes())
+	}
+	return nil
+}
+
+func (i *DRBDKernelModInstaller) Modprobe() error {
 	files, err := ioutil.ReadDir(i.KernelModToHostPath)
 	if err != nil {
 		return err
 	}
 
 	for _, file := range files {
-		modPath := fmt.Sprintf("%s/%s", i.KernelModToHostPath, file.Name())
+		modName := strings.TrimSuffix(file.Name(), filepath.Ext(file.Name()))
 		cmd := exechelper.ExecParams{
-			CmdName: "insmod",
-			CmdArgs: []string{modPath},
+			CmdName: "modprobe",
+			CmdArgs: []string{modName},
 		}
 
 		exec := nsexecutor.New()
 		execRst := exec.RunCommand(cmd)
 		if execRst.ExitCode != 0 {
-			errRespStr := string(execRst.ErrBuf.Bytes())
-			if strings.Contains(errRespStr, "File exists") {
-				log.Infof("%s has already being installed on host by manually, skiping...", file.Name())
-				continue
-			}
 			return fmt.Errorf("%w(%s)", execRst.Error, execRst.ErrBuf.Bytes())
 		}
-		log.Infof("%s has being successfully installed on host", file.Name())
+		log.Infof("%s has being successfully installed on host", modName)
 	}
 	return nil
 }

@@ -21,7 +21,11 @@ func (i *DRBDKernelModInstaller) CopyKernelModToHost() error {
 	return fmt.Errorf("NOT SUPPORT")
 }
 
-func (i *DRBDKernelModInstaller) Insmod() error {
+func (i *DRBDKernelModInstaller) Depmod() error {
+	return fmt.Errorf("NOT SUPPORT")
+}
+
+func (i *DRBDKernelModInstaller) Modprobe() error {
 	return fmt.Errorf("NOT SUPPORT")
 }
 

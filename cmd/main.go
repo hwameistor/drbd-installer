@@ -1,5 +1,3 @@
-// +build linux
-
 package main
 
 import (
@@ -42,6 +40,12 @@ func setupLogging(enableDebug bool) {
 	log.SetReportCaller(true)
 }
 
+// We presume *.ko file in kernel-mods dir should named as format "alias.ko"
+// "alias" will use for modprobe
+//
+// The kernel-mods path looks like "kernel-mods/drbd/linux/3.10.0/1160/amd64/"
+// means this dir contents DRBD kernel mods that fits amd64 linux with kernel
+// version range 3.10.0-1160 to 3.10.0-1160.X
 func main() {
 	flag.Parse()
 
@@ -65,8 +69,14 @@ func main() {
 		return
 	}
 
+	log.Info("start generating DRBD kernel mods dependencies")
+	if err := DRBDKernelModInstaller.Depmod(); err != nil {
+		log.WithError(err).Error("Failed to generate DRBD kernel mods dependencies")
+		return
+	}
+
 	log.Info("start installing DRBD kernel mods on host")
-	if err := DRBDKernelModInstaller.Insmod(); err != nil {
+	if err := DRBDKernelModInstaller.Modprobe(); err != nil {
 		log.WithError(err).Error("Failed to install DRBD kernel mods on host")
 		return
 	}
