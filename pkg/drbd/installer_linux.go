@@ -96,6 +96,7 @@ func (i *DRBDKernelModInstaller) CopyKernelModToHost() error {
 func (i *DRBDKernelModInstaller) Depmod() error {
 	cmd := exechelper.ExecParams{
 		CmdName: "depmod",
+		Timeout: 300,
 	}
 
 	exec := nsexecutor.New()
