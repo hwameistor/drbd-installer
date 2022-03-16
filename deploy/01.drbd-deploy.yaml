@@ -12,10 +12,9 @@ spec:
       labels:
         app: drbd-installer
     spec:
-      serviceAccount: dce-admin
       containers:
         - name: metrics
-          image: ghcr.io/hwameistor/drbd-installer:v0.1.0
+          image: ghcr.io/hwameistor/drbd-installer:v0.1.6
           imagePullPolicy: Always
           resources:
             limits:
@@ -26,7 +25,8 @@ spec:
               cpu: 100m
           args:
             - -debug=true
-            - -block-the-pod=true
+            - -block-the-pod=false
+            - -skip-error=false
           securityContext:
             privileged: true
           env:
@@ -41,6 +41,16 @@ spec:
               name: host-modules-dir
             - mountPath: /etc/sysconfig/modules
               name: sysconfig-modules
+      volumes:
+        - name: host-proc
+          hostPath:
+            path: /proc
+        - name: host-modules-dir
+          hostPath:
+            path: /lib/modules
+        - name: sysconfig-modules
+          hostPath:
+            path: /etc/sysconfig/modules
       tolerations:
       - key: CriticalAddonsOnly
         operator: Exists
@@ -53,13 +63,3 @@ spec:
       - effect: NoSchedule
         key: node.cloudprovider.kubernetes.io/uninitialized
         operator: Exists
-      volumes:
-        - name: host-proc
-          hostPath:
-            path: /proc
-        - name: host-modules-dir
-          hostPath:
-            path: /lib/modules
-        - name: sysconfig-modules
-          hostPath:
-            path: /etc/sysconfig/modules
