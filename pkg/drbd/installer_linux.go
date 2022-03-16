@@ -188,6 +188,10 @@ func (i *DRBDKernelModInstaller) EnsureAutoLoadWhenHostRestarted() error {
 	if _, err := autoloader.Write([]byte(DRBDAutoloader)); err != nil {
 		return err
 	}
+
+	if err := os.Chmod(DRBDAutoloaderFile, 0755); err != nil {
+		return err
+	}
 	return nil
 }
 
