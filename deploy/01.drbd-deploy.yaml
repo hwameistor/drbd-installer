@@ -13,8 +13,8 @@ spec:
         app: drbd-installer
     spec:
       containers:
-        - name: metrics
-          image: ghcr.io/hwameistor/drbd-installer:v0.1.6
+        - name: drbd-installer
+          image: ghcr.io/hwameistor/drbd-installer:v0.1.7
           imagePullPolicy: Always
           resources:
             limits:
